@@ -8,13 +8,12 @@ import {
 } from "firebase/auth";
 import { addUser } from "../utils/userSlice";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { NET_BODY_IMG, PHOTO_URL } from "../utils/constants";
 
 const Login = () => {
   const [isSignin, setIsSignin] = useState(true);
   const [validStatus, setValidStatus] = useState(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleSignin = () => {
@@ -40,11 +39,9 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
-          console.log(user);
           updateProfile(user, {
             displayName: name.current.value,
-            photoURL:
-              "https://avatars.githubusercontent.com/u/147554321?v=4&size=64",
+            photoURL: PHOTO_URL,
           })
             .then(() => {
               const { uid, email, displayName, photoURL } = auth.currentUser;
@@ -56,7 +53,6 @@ const Login = () => {
                   photoURL: photoURL,
                 })
               );
-              navigate("/browse");
             })
             .catch((error) => {
               console.log(error);
@@ -72,13 +68,12 @@ const Login = () => {
         auth,
         email.current.value,
         password.current.value
-        // name.current.value
+        //name.current.value
       )
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
           console.log(user);
-          navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -91,10 +86,7 @@ const Login = () => {
   return (
     <div className="relative w-full h-screen">
       <Header />
-      <img
-        src="https://assets.nflxext.com/ffe/siteui/vlv3/258d0f77-2241-4282-b613-8354a7675d1a/web/IN-en-20250721-TRIFECTA-perspective_cadc8408-df6e-4313-a05d-daa9dcac139f_medium.jpg"
-        alt="body_image"
-      />
+      <img src={NET_BODY_IMG} alt="body_image" />
       <form
         onSubmit={(e) => e.preventDefault()}
         action=""
@@ -105,7 +97,7 @@ const Login = () => {
         </h2>
         {!isSignin ? (
           <input
-            // ref={name}
+            ref={name}
             type="text"
             placeholder="Full Name"
             className="p-2 rounded mt-4 bg-gray-500/50 h-[60px] focus:outline-none"
