@@ -1,10 +1,11 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { API_OPTION } from "../utils/constants";
 import { addHorrorMovies } from "../utils/moviesSlice"; // ✅ reducer me action add karna hoga
 import { useEffect } from "react";
 
 const useHorrorMovies = () => {
   const dispatch = useDispatch();
+  const horrorMovies = useSelector((store) => store.movies.horrorMovies);
 
   const getHorrorMovies = async () => {
     const data = await fetch(
@@ -16,7 +17,7 @@ const useHorrorMovies = () => {
   };
 
   useEffect(() => {
-    getHorrorMovies();
+    if (!horrorMovies) getHorrorMovies();
   }, []);
 };
 

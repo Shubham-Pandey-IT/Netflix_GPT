@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import MoviesList from "./MoviesList";
 const SecondaryContainer = () => {
   const movies = useSelector((store) => store.movies);
-  console.log(movies);
   return (
     <div className="bg-black">
       <div className="z-10 -mt-54  relative">
