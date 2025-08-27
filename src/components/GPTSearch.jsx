@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import OPEN_AI from "../utils/openAI";
-import { mockGPTResponses } from "../utils/mockGptResponse";
+// import { mockGPTResponses } from "../utils/mockGptResponse";
 import { API_OPTION } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { tmdbMovieResults } from "../utils/GPTSlice";
@@ -21,27 +21,40 @@ const GPTSearch = () => {
   };
 
   const handleGPTSearch = async () => {
-    const query = searchText.current.value.toLowerCase();
+    //const query = searchText.current.value.toLowerCase();
 
-    // Pick a mock response based on query or use default
-    const matchedCategories = Object.keys(mockGPTResponses).filter((cat) =>
-      query.includes(cat)
-    );
+    const GPTQuery = `
+        You are a Movie Recommendation System.
+        User Query: ${searchText.current.value}
 
-    //mockGPTResponseArray
-    const responseArray = matchedCategories.length
-      ? matchedCategories.flatMap((cat) => mockGPTResponses[cat])
-      : [];
-    //console.log(responseArray);
+        Rules:
+        - Recommend at most 5 movies only.
+        - Return movie names separated by commas.
+        - Do not give descriptions, just titles.
+        Example: Sholay, Krish, Don, Sita Aur Gita, Hum Aapke Hain Kaun
+        `;
+
+    const matchedCategories = await OPEN_AI.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: GPTQuery }],
+    });
+
+    //console.log(matchedCategories);
+
+    const movies_Text_list_array =
+      matchedCategories.choices?.[0]?.message?.content.split(",");
+
     //for each movie we map TMdB Api
-    const promishArray = responseArray.map((movies) => searchMovieTmdB(movies));
+    const promishArray = movies_Text_list_array.map((movies) =>
+      searchMovieTmdB(movies)
+    );
 
     const tmdbResults = await Promise.all(promishArray);
     console.log(tmdbResults);
 
     dispatch(
       tmdbMovieResults({
-        moviesNames: responseArray,
+        moviesNames: movies_Text_list_array,
         moviesResults: tmdbResults, // array of arrays
       })
     );
